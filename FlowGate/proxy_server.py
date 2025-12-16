@@ -10,7 +10,7 @@ class ProxyServer:
 
     async def handle_client(self, reader, writer):
         client_addr = writer.get_extra_info("peername")
-        log("----------------------START OF REQUEST------------------------")
+        log("START OF REQUEST")
         log("client_connected", client=client_addr)
 
         try:
@@ -54,11 +54,12 @@ class ProxyServer:
 
             self.health.record_success(backend)
 
-            log("request_ok", backend=f"{backend.host}:{backend.port}")
+            log("request_success", backend=f"{backend.host}:{backend.port}")
 
         except Exception as e:
             self.health.record_failure(backend)
-            log("request_fail", backend=f"{backend.host}:{backend.port}", error=str(e))
+            error_msg = str(e) if str(e) else repr(e)  # Use repr if str is empty
+            log("request_failed", backend=f"{backend.host}:{backend.port}", error=error_msg)
 
             writer.write(b"HTTP/1.1 504 Gateway Timeout\r\n\r\n")
             await writer.drain()
@@ -66,6 +67,4 @@ class ProxyServer:
         finally:
             writer.close()
             log("connection_closed", client=client_addr)
-            log("----------------------END OF REQUEST------------------------\n")
-
-        
+            log("END OF REQUEST")

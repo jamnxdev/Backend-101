@@ -22,7 +22,7 @@ async def main():
         config.LISTEN_PORT,
     )
 
-    print(f"FlowGazte running on {config.LISTEN_PORT}")
+    print(f"FlowGate running on {config.LISTEN_PORT}")
 
     async with server:
         await server.serve_forever()
